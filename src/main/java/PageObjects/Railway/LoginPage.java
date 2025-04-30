@@ -1,46 +1,46 @@
 package PageObjects.Railway;
 
-import Common.Constant.Constant;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class LoginPage extends GeneralPage {
-    // Locators
+    public LoginPage(WebDriver driver) {
+        super(driver);
+    }
+
     private final By _txtUsername = By.xpath("//input[@id='username']");
     private final By _txtPassword = By.xpath("//input[@id='password']");
     private final By _btnLogin = By.xpath("//input[@value='login']");
     private final By _lblLoginErrorMsg = By.xpath("//p[@class='message error LoginForm']");
 
-    // Elements
-    public WebElement getTxtUsername(){
-        return Constant.WEBDRIVER.findElement(_txtUsername);
-
-    }
-    public WebElement getTxtPassword(){
-        return Constant.WEBDRIVER.findElement(_txtPassword);
-    }
-    public WebElement getBtnLogin(){
-        return Constant.WEBDRIVER.findElement(_btnLogin);
-    }
-    public WebElement getLblLoginErrorMsg(){
-        return Constant.WEBDRIVER.findElement(_lblLoginErrorMsg);
+    public WebElement getTxtUsername() {
+        return driver.findElement(_txtUsername);
     }
 
-    //Methods
-    public HomePage login(String username, String password)
-    {
-        // Submit login credentials
+    public WebElement getTxtPassword() {
+        return driver.findElement(_txtPassword);
+    }
+
+    public WebElement getBtnLogin() {
+        return driver.findElement(_btnLogin);
+    }
+
+    public WebElement getLblLoginErrorMsg() {
+        return driver.findElement(_lblLoginErrorMsg);
+    }
+
+    public HomePage login(String username, String password) {
         this.getTxtUsername().sendKeys(username);
         this.getTxtPassword().sendKeys(password);
         scrollToElement(getBtnLogin());
         this.getBtnLogin().click();
-        return new HomePage();
+        return new HomePage(driver);
     }
+
     private void scrollToElement(WebElement element) {
-        JavascriptExecutor js = (JavascriptExecutor) Constant.WEBDRIVER;
+        JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].scrollIntoView(true);", element);
     }
-
 }
-

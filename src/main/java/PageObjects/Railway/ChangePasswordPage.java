@@ -1,17 +1,22 @@
 package PageObjects.Railway;
-import org.openqa.selenium.By;
 
-import static Common.Constant.Constant.WEBDRIVER;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 
 public class ChangePasswordPage extends GeneralPage {
+
+    public ChangePasswordPage(WebDriver driver) {
+        super(driver);
+    }
+
     private final By changePasswordTab = By.xpath("//a[@href='/Account/ChangePassword']");
 
     public ChangePasswordPage clickChangePasswordTab() {
-        WEBDRIVER.findElement(changePasswordTab).click();
+        driver.findElement(changePasswordTab).click();
         return this;
     }
 
     public boolean isChangePasswordPageDisplayed() {
-        return WEBDRIVER.getCurrentUrl().contains("ChangePassword");
+        return driver.getCurrentUrl().contains("ChangePassword");
     }
 }

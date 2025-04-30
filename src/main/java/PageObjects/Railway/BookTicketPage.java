@@ -1,7 +1,9 @@
 package PageObjects.Railway;
 
+import Common.Common.Utilities;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
@@ -10,10 +12,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 
-import static Common.Constant.Constant.WEBDRIVER;
-
-
 public class BookTicketPage extends GeneralPage {
+    public BookTicketPage(WebDriver driver) {
+        super(driver);
+    }
+
     private final By selectDepartFrom = By.xpath("//select[@name='DepartStation']");
     private final By selectArriveAt = By.xpath("//select[@name='ArriveStation']");
     private final By selectSeatType = By.xpath("//select[@name='SeatType']");
@@ -28,53 +31,47 @@ public class BookTicketPage extends GeneralPage {
     private final By successMessage = By.xpath("//div[@id='content']//h1[contains(text(),'Ticket booked successfully!')]");
 
     public String getDepartDate() {
-        WebElement departDateElement = WEBDRIVER.findElement(departDateField);
-        return departDateElement.getText();
+        return driver.findElement(departDateField).getText();
     }
 
     public String getDepartStation() {
-        WebElement departStationElement = WEBDRIVER.findElement(departStationField);
-        return departStationElement.getText();
+        return driver.findElement(departStationField).getText();
     }
 
     public String getArriveStation() {
-        WebElement arriveStationElement = WEBDRIVER.findElement(arriveStationField);
-        return arriveStationElement.getText();
+        return driver.findElement(arriveStationField).getText();
     }
 
     public String getSeatType() {
-        WebElement seatTypeElement = WEBDRIVER.findElement(seatTypeField);
-        return seatTypeElement.getText();
+        return driver.findElement(seatTypeField).getText();
     }
 
     public String getAmount() {
-        WebElement amountElement = WEBDRIVER.findElement(amountField);
-        return amountElement.getText();
+        return driver.findElement(amountField).getText();
     }
 
     public boolean isTicketBookedSuccessfullyDisplayed() {
         try {
-            WebElement successMessageElement = WEBDRIVER.findElement(successMessage);
-            return successMessageElement.isDisplayed();
-        } catch (org.openqa.selenium.NoSuchElementException | org.openqa.selenium.StaleElementReferenceException e) {
+            return driver.findElement(successMessage).isDisplayed();
+        } catch (Exception e) {
             return false;
         }
     }
 
     public void selectRandomDepartDate() {
-        WebElement dropdown = WEBDRIVER.findElement(selectDepartDate);
-        scrollToElement(dropdown);
+        WebElement dropdown = driver.findElement(selectDepartDate);
+        Utilities.scrollToElement(driver, dropdown);
         Select select = new Select(dropdown);
         List<WebElement> options = select.getOptions();
         int randomIndex = new Random().nextInt(options.size());
         select.selectByIndex(randomIndex);
     }
 
-    private void selectOptionInDropdown(By dropdownLocator, String option) {
-        WebElement dropdown = WEBDRIVER.findElement(dropdownLocator);
-        scrollToElement(dropdown);
+    private void selectOptionInDropdown(By locator, String value) {
+        WebElement dropdown = driver.findElement(locator);
+        Utilities.scrollToElement(driver, dropdown);
         Select select = new Select(dropdown);
-        select.selectByVisibleText(option);
+        select.selectByVisibleText(value);
     }
 
     public void selectDepartFrom(String station) {
@@ -94,67 +91,43 @@ public class BookTicketPage extends GeneralPage {
     }
 
     public void clickBookTicketButton() {
-        WebElement button = WEBDRIVER.findElement(btnBookTicket);
-        scrollToElement(button);
+        WebElement button = driver.findElement(btnBookTicket);
+        Utilities.scrollToElement(driver, button);
         button.click();
     }
 
-    private void scrollToElement(WebElement element) {
-        ((JavascriptExecutor) WEBDRIVER).executeScript("arguments[0].scrollIntoView(true);", element);
-    }
-
     public void selectDepartDate(int daysToAdd) {
-        System.out.println("Calling selectDepartDate method...");
-
-        // Lấy ngày hiện tại
         LocalDate today = LocalDate.now();
-
-        // Thêm số ngày cần thiết
         LocalDate desiredDate = today.plusDays(daysToAdd);
 
         if (daysToAdd >= 3 && daysToAdd <= 30) {
-            // Định dạng ngày mong muốn thành chuỗi
             String formattedDate = desiredDate.format(DateTimeFormatter.ofPattern("M/d/yyyy"));
-
-            // Gọi hàm selectOptionInDropdown với ngày đã được định dạng
             selectOptionInDropdown(selectDepartDate, formattedDate);
-            System.out.println("selectDepartDate method executed successfully.");
         } else {
-            System.out.println("We only have tickets for 3-30 days ahead.");
-            System.out.println("Please come to the station to buy a ticket if you need to depart within 2 days.");
+            System.out.println("Only allow booking from 3 to 30 days ahead.");
         }
     }
 
     public boolean verifyTicketDetails(String departStation, String arriveStation, String seatType, String departDate, String amount) {
-        WebElement table = WEBDRIVER.findElement(By.xpath("//table[@class='MyTable WideTable']"));
-        WebElement row = table.findElement(By.xpath("//tr[@class='OddRow']")); // Assuming there's only one row for simplicity
-
-        String actualDepartStation = row.findElement(By.xpath("//td[1]")).getText();
-        String actualArriveStation = row.findElement(By.xpath("//td[2]")).getText();
-        String actualSeatType = row.findElement(By.xpath("//td[3]")).getText();
-        String actualDepartDate = row.findElement(By.xpath("//td[4]")).getText();
-        String actualAmount = row.findElement(By.xpath("//td[7]")).getText();
-
-        return actualDepartStation.equals(departStation)
-                && actualArriveStation.equals(arriveStation)
-                && actualSeatType.equals(seatType)
-                && actualDepartDate.equals(departDate)
-                && actualAmount.equals(amount);
+        WebElement row = driver.findElement(By.xpath("//table[@class='MyTable WideTable']//tr[@class='OddRow']"));
+        return row.findElement(By.xpath("td[1]")).getText().equals(departStation) &&
+                row.findElement(By.xpath("td[2]")).getText().equals(arriveStation) &&
+                row.findElement(By.xpath("td[3]")).getText().equals(seatType) &&
+                row.findElement(By.xpath("td[4]")).getText().equals(departDate) &&
+                row.findElement(By.xpath("td[7]")).getText().equals(amount);
     }
+
     public String getDepartFrom() {
-        WebElement departFromElement = WEBDRIVER.findElement(selectDepartFrom);
-        Select select = new Select(departFromElement);
-        return select.getFirstSelectedOption().getText();
+        return new Select(driver.findElement(selectDepartFrom)).getFirstSelectedOption().getText();
     }
 
     public String getArriveAt() {
-        WebElement arriveAtElement = WEBDRIVER.findElement(selectArriveAt);
-        Select select = new Select(arriveAtElement);
-        return select.getFirstSelectedOption().getText();
+        return new Select(driver.findElement(selectArriveAt)).getFirstSelectedOption().getText();
     }
+
     public String getBookingId() {
-        String currentUrl = WEBDRIVER.getCurrentUrl();
+        String currentUrl = driver.getCurrentUrl();
         String[] parts = currentUrl.split("=");
-        return parts[1]; // Trả về phần tử thứ hai sau dấu "="
+        return parts.length > 1 ? parts[1] : "";
     }
 }

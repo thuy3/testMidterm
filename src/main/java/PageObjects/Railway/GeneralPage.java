@@ -1,30 +1,33 @@
 package PageObjects.Railway;
 
-import Common.Constant.Constant;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class GeneralPage {
-    // Locators
+    protected WebDriver driver;
+
+    public GeneralPage(WebDriver driver) {
+        this.driver = driver;
+    }
+
     private final By tabLogin = By.xpath("//div[@id='menu']//a[@href='/Account/Login.cshtml']");
     private final By tabLogout = By.xpath("//div[@id='menu']//a[@href='/Account/Logout']");
     private final By lblwelcomeMessage = By.xpath("//div[@class='account']/strong");
 
-    //Elements
     protected WebElement getTabLogin() {
-        return Constant.WEBDRIVER.findElement(tabLogin);
+        return driver.findElement(tabLogin);
     }
 
     protected WebElement getTabLogout() {
-        return Constant.WEBDRIVER.findElement(tabLogout);
+        return driver.findElement(tabLogout);
     }
 
     protected WebElement getLblWelcomeMessage() {
-        return Constant.WEBDRIVER.findElement(lblwelcomeMessage);
+        return driver.findElement(lblwelcomeMessage);
     }
 
-    // Methods
     public String getWelcomeMessage() {
         return this.getLblWelcomeMessage().getText();
     }
@@ -32,12 +35,11 @@ public class GeneralPage {
     public LoginPage gotoLoginPage() {
         scrollToElement(getTabLogin());
         this.getTabLogin().click();
-        return new LoginPage();
+        return new LoginPage(driver);
     }
 
     private void scrollToElement(WebElement element) {
-        JavascriptExecutor js = (JavascriptExecutor) Constant.WEBDRIVER;
+        JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].scrollIntoView(true);", element);
     }
 }
-

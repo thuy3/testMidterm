@@ -2,18 +2,23 @@ package PageObjects.Railway;
 
 import Common.Constant.Constant;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static Common.Constant.Constant.WEBDRIVER;
+public class HomePage extends GeneralPage {
+    public HomePage(WebDriver driver) {
+        super(driver);
+    }
 
-public class HomePage extends GeneralPage{
     public HomePage open() {
-        WEBDRIVER.navigate().to(Constant.RAILWAY_URL);
+        driver.navigate().to(Constant.RAILWAY_URL);
         return this;
     }
+
     private final By myTicketTab = By.xpath("//a[@href='/Page/ManageTicket.cshtml']");
     private final By changePasswordTab = By.xpath("//a[@href='/Account/ChangePassword.cshtml']");
     private final By logoutTab = By.xpath("//a[@href='/Account/Logout']");
+    private final By _tabTimetable = By.linkText("Timetable");
 
     public boolean isMyTicketTabDisplayed() {
         return isElementDisplayed(myTicketTab);
@@ -28,56 +33,51 @@ public class HomePage extends GeneralPage{
     }
 
     public MyTicketPage clickMyTicketTab() {
-        WEBDRIVER.findElement(myTicketTab).click();
-        return new MyTicketPage();
+        driver.findElement(myTicketTab).click();
+        return new MyTicketPage(driver);
     }
 
     public ChangePasswordPage clickChangePasswordTab() {
-        WEBDRIVER.findElement(changePasswordTab).click();
-        return new ChangePasswordPage();
+        driver.findElement(changePasswordTab).click();
+        return new ChangePasswordPage(driver);
     }
 
     public LoginPage clickLogoutTab() {
-        WEBDRIVER.findElement(logoutTab).click();
-        return new LoginPage();
+        driver.findElement(logoutTab).click();
+        return new LoginPage(driver);
     }
 
     private boolean isElementDisplayed(By elementLocator) {
         try {
-            return WEBDRIVER.findElement(elementLocator).isDisplayed();
-        } catch (org.openqa.selenium.NoSuchElementException | org.openqa.selenium.StaleElementReferenceException e) {
+            return driver.findElement(elementLocator).isDisplayed();
+        } catch (Exception e) {
             return false;
         }
     }
+
     public RegisterPage gotoRegisterPage() {
         By registerTab = By.xpath("//a[@href='/Account/Register.cshtml']");
-        WEBDRIVER.findElement(registerTab).click();
-        return new RegisterPage();
+        driver.findElement(registerTab).click();
+        return new RegisterPage(driver);
     }
+
     public BookTicketPage clickBookTicketTab() {
-        WebElement bookTicketTab = WEBDRIVER.findElement(By.xpath("//a[@href='/Page/BookTicketPage.cshtml']"));
+        WebElement bookTicketTab = driver.findElement(By.xpath("//a[@href='/Page/BookTicketPage.cshtml']"));
         bookTicketTab.click();
-        return new BookTicketPage();
+        return new BookTicketPage(driver);
     }
-    private final By _tabTimetable = By.linkText("Timetable");
 
-    // Method to navigate to the Timetable page
     public TimeTablePage gotoTimeTable() {
-        WEBDRIVER.findElement(_tabTimetable).click();
-        return new TimeTablePage();
+        driver.findElement(_tabTimetable).click();
+        return new TimeTablePage(driver);
     }
+
     public WebElement getTabMyTicket() {
-        return Constant.WEBDRIVER.findElement(myTicketTab);
+        return driver.findElement(myTicketTab);
     }
-
-
 
     public MyTicketPage gotoMyTicketPage() {
         getTabMyTicket().click();
-        return new MyTicketPage();
+        return new MyTicketPage(driver);
     }
-
-
-
 }
-
