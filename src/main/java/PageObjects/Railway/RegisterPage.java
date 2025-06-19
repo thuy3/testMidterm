@@ -1,7 +1,9 @@
 package PageObjects.Railway;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class RegisterPage extends GeneralPage {
 
@@ -19,7 +21,7 @@ public class RegisterPage extends GeneralPage {
     private final By _lblErrorPid = By.xpath("//*[@id='RegisterForm']/fieldset/ol/li[4]/label[2]");
 
     public void goToRegisterPage() {
-        driver.get("http://railwayb1.somee.com/Account/Register.cshtml"); // Cập nhật lại URL nếu khác
+        driver.get("http://railwayb1.somee.com/Account/Register.cshtml");
     }
 
     public void enterEmail(String email) {
@@ -39,16 +41,19 @@ public class RegisterPage extends GeneralPage {
     }
 
     public void clickRegisterButton() {
-        driver.findElement(_btnRegister).click();
+        WebElement registerButton = driver.findElement(_btnRegister);
+        try {
+            registerButton.click();
+        } catch (Exception e) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].scrollIntoView(true);", registerButton);
+            js.executeScript("arguments[0].click();", registerButton);
+        }
     }
 
     public boolean isErrorMessageDisplayed() {
-        return isElementDisplayed(_lblErrorMessage);
-    }
-
-    private boolean isElementDisplayed(By locator) {
         try {
-            return driver.findElement(locator).isDisplayed();
+            return driver.findElement(_lblErrorMessage).isDisplayed();
         } catch (Exception e) {
             return false;
         }
@@ -71,15 +76,27 @@ public class RegisterPage extends GeneralPage {
     }
 
     public String getPasswordErrorMessage() {
-        return driver.findElement(_lblErrorPassword).getText();
+        try {
+            return driver.findElement(_lblErrorPassword).getText();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public String getPIDErrorMessage() {
-        return driver.findElement(_lblErrorPid).getText();
+        try {
+            return driver.findElement(_lblErrorPid).getText();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public String getRegisterErrorMessage() {
-        return driver.findElement(_lblErrorMessage).getText();
+        try {
+            return driver.findElement(_lblErrorMessage).getText();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public void verifyErrorMessage(String expectedMessage) {
@@ -90,7 +107,13 @@ public class RegisterPage extends GeneralPage {
     }
 
     public void verifyRegistrationSuccess() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         String successText = driver.findElement(By.id("content")).getText();
+        System.out.println("Actual success text: " + successText);
         if (!successText.contains("Thank you for registering your account")) {
             throw new AssertionError("Registration was not successful.");
         }

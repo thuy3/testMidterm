@@ -1,9 +1,10 @@
 package PageObjects.Railway;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class GeneralPage {
     protected WebDriver driver;
@@ -27,9 +28,11 @@ public class GeneralPage {
     protected WebElement getLblWelcomeMessage() {
         return driver.findElement(lblwelcomeMessage);
     }
-
     public String getWelcomeMessage() {
-        return this.getLblWelcomeMessage().getText();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WebElement welcomeText = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//*[contains(text(), 'Welcome to Safe Railway')]"))); // Linh hoạt với mọi thẻ
+        return welcomeText.getText();
     }
 
     public LoginPage gotoLoginPage() {

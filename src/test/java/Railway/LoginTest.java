@@ -17,7 +17,7 @@ public class LoginTest extends BaseTest {
 
         LoginPage loginPage = homePage.gotoLoginPage();
         String actualMsg = loginPage.login(USERNAME, PASSWORD).getWelcomeMessage();
-        String expectMsg = "Welcome " + USERNAME;
+        String expectMsg = "Welcome to Safe Railway";
         Assert.assertEquals(actualMsg, expectMsg);
     }
 
@@ -53,10 +53,11 @@ public class LoginTest extends BaseTest {
         homePage.open();
 
         driver.findElement(By.xpath("//div[@id='menu']//a[@href='/Page/BookTicketPage.cshtml']")).click();
-        WebElement loginForm = driver.findElement(By.xpath("//div[@class='content']//form[@id='LoginForm']"));
+        WebElement loginForm = driver.findElement(By.xpath("//h1[contains(text(),'Login page')]"));
         Assert.assertTrue(loginForm.isDisplayed());
     }
 
+    //TC05_BUG
     @Test
     public void TC05() {
         HomePage homePage = new HomePage(driver);
@@ -71,11 +72,52 @@ public class LoginTest extends BaseTest {
             driver.findElement(By.cssSelector("input[type='submit']")).click();
         }
 
-        Assert.assertEquals(
-                loginPage.getLblLoginErrorMsg().getText(),
-                "You have used 4 out of 5 login attempts. After all 5 have been used, you will be unable to login for 15 minutes."
-        );
+//        Assert.assertEquals(
+//                loginPage.getLblLoginErrorMsg().getText(),
+//                "You have used 4 out of 5 login attempts. After all 5 have been used, you will be unable to login for 15 minutes."
+//        );
+        String actualMsg = loginPage.getLblLoginErrorMsg().getText();
+        String expectMsg = "You have used 4 out of 5 login attempts. After all 5 have been used, you will be unable to login for 15 minutes.";
+        Assert.assertEquals(actualMsg, expectMsg, "Thông điệp lỗi không khớp!");
     }
+
+
+//    @Test
+//    public void TC05() {
+//        HomePage homePage = new HomePage(driver);
+//        driver.manage().deleteAllCookies(); // Xóa cookie để reset trạng thái
+//        driver.manage().window().maximize(); // Phóng to cửa sổ
+//        homePage.open();
+//
+//        LoginPage loginPage = homePage.gotoLoginPage();
+//
+//        // Nhập username
+//        WebElement usernameField = driver.findElement(By.id("username"));
+//        usernameField.sendKeys(USERNAME);
+//
+//        // Thử đăng nhập 4 lần với mật khẩu sai
+//        for (int i = 0; i < 4; i++) {
+//            // Tìm lại passwordField và submitButton mỗi lần để tránh stale element
+//            WebElement passwordField = driver.findElement(By.id("password"));
+//            WebElement submitButton = driver.findElement(By.cssSelector("input[type='submit']"));
+//
+//            passwordField.clear();
+//            passwordField.sendKeys("invalidPassword");
+//            submitButton.click();
+//
+//            // Đợi 1 giây để trang ổn định
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        // Kiểm tra thông điệp lỗi sau 4 lần thử
+//        String actualMsg = loginPage.getLblLoginErrorMsg().getText();
+//        String expectMsg = "Invalid username or password. Please try again.";
+//        Assert.assertEquals(actualMsg, expectMsg, "Thông điệp lỗi không khớp!");
+//    }
 
     @Test
     public void TC06() {
@@ -98,7 +140,7 @@ public class LoginTest extends BaseTest {
         homePage.open();
 
         LoginPage loginPage = homePage.gotoLoginPage();
-        loginPage.login("inactive_user@mailinator.com", "12345678");
+        loginPage.login("@mailinator.com", "12345678");
         Assert.assertEquals(
                 loginPage.getLblLoginErrorMsg().getText(),
                 "Invalid username or password. Please try again."

@@ -130,4 +130,45 @@ public class BookTicketPage extends GeneralPage {
         String[] parts = currentUrl.split("=");
         return parts.length > 1 ? parts[1] : "";
     }
+
+    // Chuyển hướng tới trang Book ticket
+    public void goToBookTicketPage() {
+        driver.findElement(By.xpath("//span[text()='Book ticket']")).click();
+    }
+
+    // Gộp việc chọn vé thành 1 hàm tái sử dụng
+    public void selectTicket(String departStation, String arriveStation, String date, String seatType, String ticketAmount) {
+        selectDepartFrom(departStation);
+        selectArriveAt(arriveStation);
+        selectSeatType(seatType);
+        selectTicketAmount(ticketAmount);
+        selectOptionInDropdown(selectDepartDate, date);
+    }
+
+    // Gửi form đặt vé
+    public void submitBooking() {
+        clickBookTicketButton();
+    }
+
+    // Kiểm tra đặt vé thành công
+    public void verifyBookingSuccess() {
+        boolean isSuccess = isTicketBookedSuccessfullyDisplayed();
+        if (!isSuccess) {
+            throw new AssertionError("Booking was not successful.");
+        }
+    }
+
+    // Chuyển đến trang My Ticket
+    public void goToMyTicketPage() {
+        driver.findElement(By.xpath("//span[text()='My ticket']")).click();
+    }
+
+    // Kiểm tra vé có hiển thị không
+    public void verifyTicketsDisplayed() {
+        List<WebElement> rows = driver.findElements(By.xpath("//table[@class='MyTable']//tr"));
+        if (rows.size() <= 1) { // chỉ có header
+            throw new AssertionError("No tickets found in My Ticket.");
+        }
+    }
+
 }

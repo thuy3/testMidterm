@@ -17,7 +17,7 @@ public class BaseTest {
 
     @BeforeMethod
     public void setup() {
-        WebDriverManager.chromedriver().setup();
+        //WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get("http://railwayb1.somee.com");
