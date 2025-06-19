@@ -13,8 +13,8 @@ public class ForgotPasswordPage extends GeneralPage {
     private final By lnkForgotPassword = By.linkText("Forgot Password page");
     private final By txtEmail = By.id("email");
     private final By btnSendInstructions = By.xpath("//input[@value='Send Instructions']");
-    private final By lblResetPasswordPage = By.xpath("//h1[contains(text(),'Forgot Password')]");
-    private final By lblEmailSent = By.xpath("//p[contains(text(),'Instructions have been sent to your email')]");
+    private final By lblResetPasswordPage = By.xpath("//legend[contains(text(),'Password Reset Instructions Form')]");
+    private final By lblEmailSent = By.xpath("//p[contains(text(),'We have sent instructions')]");
     private final By resetPasswordForm = By.id("ResetPasswordForm");
 
     // Actions

@@ -15,6 +15,10 @@ public class LoginPage extends GeneralPage {
     private final By _btnLogin = By.xpath("//input[@value='login']");
     private final By _lblLoginErrorMsg = By.xpath("//p[@class='message error LoginForm']");
 
+    public void goToLoginPage() {
+        driver.get("http://railwayb1.somee.com/Account/Login.cshtml");
+    }
+
     public WebElement getTxtUsername() {
         return driver.findElement(_txtUsername);
     }
