@@ -16,37 +16,42 @@ public class BookingTest extends BaseTest {
         loginPage.login(username, password);
     }
 
-
+    //BUG: dropdown don't have S
     @Test
     public void TC14_BookTicketSuccessfully() {
-        loginBeforeBooking("testuser@mailinator.com", "12345678");
-
+        loginBeforeBooking("test123@mailinator.com", "httt12345");
         BookTicketPage book = new BookTicketPage(driver);
         book.goToBookTicketPage();
-        book.selectTicket("Sài Gòn", "Nha Trang", "7/5/2025", "Soft bed", "1");
+        String departDate = java.time.LocalDate.now().plusDays(5).format(java.time.format.DateTimeFormatter.ofPattern("M/d/yyyy"));
+        book.selectTicket("Sài Gòn", "Nha Trang", departDate, "Soft bed with air conditioner", "1");
         book.submitBooking();
         book.verifyBookingSuccess();
+        // check ticket detail
+        Assert.assertTrue(book.verifyTicketDetails("Sài Gòn", "Nha Trang", "Soft bed with air conditioner", departDate, "1"),
+                "Thông tin vé không đúng!");
     }
 
     @Test
-    public void TC15_BookMultipleTickets() {
-        loginBeforeBooking("testuser@mailinator.com", "12345678");
+    public void TC15_OpenBookTicketFromTimetable() {
+        loginBeforeBooking("test123@mailinator.com", "httt12345");
+        TimeTablePage timetable = new TimeTablePage(driver);
+        timetable.goToTimetablePage();
+        timetable.clickBookTicketHueToSaigon();
+        timetable.verifyDepartAndArriveStations("Huế", "Sài Gòn");
+    }
 
+    @Test
+    public void TC16_CancelTicket() {
+        loginBeforeBooking("test123@mailinator.com", "httt12345");
         BookTicketPage book = new BookTicketPage(driver);
         book.goToBookTicketPage();
-        for (int i = 0; i < 5; i++) {
-            book.selectTicket("Sài Gòn", "Nha Trang", "8/5/2025", "Soft bed", "1");
-            book.submitBooking();
-            book.verifyBookingSuccess();
-        }
-    }
-
-    @Test
-    public void TC16_ViewMyTickets() {
-        loginBeforeBooking("testuser@mailinator.com", "12345678");
-
-        BookTicketPage book = new BookTicketPage(driver);
+        String departDate = java.time.LocalDate.now().plusDays(5).format(java.time.format.DateTimeFormatter.ofPattern("M/d/yyyy"));
+        book.selectTicket("Huế", "Sài Gòn", departDate, "Soft bed with air conditioner", "1");
+        book.submitBooking();
         book.goToMyTicketPage();
-        book.verifyTicketsDisplayed();
+        String bookingId = book.getBookingId();
+        book.cancelTicket(bookingId);
+        book.confirmCancel();
+        book.verifyTicketDisappeared(bookingId);
     }
 }

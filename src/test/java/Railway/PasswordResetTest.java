@@ -52,12 +52,35 @@ public class PasswordResetTest extends BaseTest {
 
 
 
+//    @Test
+//    public void TC13_OpenResetLinkFromMailinator() {
+//        ForgotPasswordPage forgot = new ForgotPasswordPage(driver);
+//        forgot.openMailinator("testuser");
+//        forgot.openResetEmail();
+//        forgot.clickResetLink();
+//        forgot.verifyResetPasswordFormDisplayed();
+//    }
+    //BUG
     @Test
-    public void TC13_OpenResetLinkFromMailinator() {
+    public void TC13_PasswordAndConfirmPasswordMismatch() {
         ForgotPasswordPage forgot = new ForgotPasswordPage(driver);
-        forgot.openMailinator("testuser");
+
+        forgot.goToLoginPage();
+        forgot.clickForgotPassword();
+
+        String email = "test123@mailinator.com";
+        forgot.enterEmail(email);
+
+        forgot.submitRequest();
+        forgot.verifyEmailSentMessage();
+
+        forgot.openMailinator("test123");
         forgot.openResetEmail();
         forgot.clickResetLink();
         forgot.verifyResetPasswordFormDisplayed();
+        forgot.enterPasswordDetails("Password123", "DifferentPassword123");
+        forgot.clickResetPasswordButton();
+        forgot.verifyGeneralErrorMessage();
+        forgot.verifyConfirmPasswordErrorMessage();
     }
 }

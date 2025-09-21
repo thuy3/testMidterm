@@ -1,14 +1,17 @@
 package PageObjects.Railway;
 
 import Common.Common.Utilities;
+import PageObjects.Railway.GeneralPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
-
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 
@@ -126,17 +129,27 @@ public class BookTicketPage extends GeneralPage {
     }
 
     public String getBookingId() {
-        String currentUrl = driver.getCurrentUrl();
-        String[] parts = currentUrl.split("=");
-        return parts.length > 1 ? parts[1] : "";
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement row = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//tr[@class='OddRow']")));
+            WebElement cancelButton = row.findElement(By.xpath(".//input[@value='Cancel']"));
+            String onclick = cancelButton.getAttribute("onclick");
+            if (onclick == null || !onclick.contains("DeleteTicket")) {
+                System.out.println("HTML của trang My Ticket:\n" + driver.getPageSource());
+                throw new IllegalStateException("Không tìm thấy thuộc tính onclick hợp lệ: " + onclick);
+            }
+            return onclick.replaceAll(".*?DeleteTicket\\((\\d+)\\).*", "$1");
+        } catch (Exception e) {
+            System.out.println("Lỗi khi lấy bookingId, HTML của trang:\n" + driver.getPageSource());
+            throw new AssertionError("Không thể lấy bookingId: " + e.getMessage());
+        }
     }
 
-    // Chuyển hướng tới trang Book ticket
     public void goToBookTicketPage() {
         driver.findElement(By.xpath("//span[text()='Book ticket']")).click();
     }
 
-    // Gộp việc chọn vé thành 1 hàm tái sử dụng
     public void selectTicket(String departStation, String arriveStation, String date, String seatType, String ticketAmount) {
         selectDepartFrom(departStation);
         selectArriveAt(arriveStation);
@@ -145,30 +158,54 @@ public class BookTicketPage extends GeneralPage {
         selectOptionInDropdown(selectDepartDate, date);
     }
 
-    // Gửi form đặt vé
     public void submitBooking() {
         clickBookTicketButton();
     }
 
-    // Kiểm tra đặt vé thành công
     public void verifyBookingSuccess() {
         boolean isSuccess = isTicketBookedSuccessfullyDisplayed();
         if (!isSuccess) {
+            System.out.println("HTML của trang sau khi đặt vé:\n" + driver.getPageSource());
             throw new AssertionError("Booking was not successful.");
         }
     }
 
-    // Chuyển đến trang My Ticket
     public void goToMyTicketPage() {
         driver.findElement(By.xpath("//span[text()='My ticket']")).click();
     }
 
-    // Kiểm tra vé có hiển thị không
     public void verifyTicketsDisplayed() {
         List<WebElement> rows = driver.findElements(By.xpath("//table[@class='MyTable']//tr"));
-        if (rows.size() <= 1) { // chỉ có header
+        if (rows.size() <= 1) {
             throw new AssertionError("No tickets found in My Ticket.");
         }
     }
 
+    public void cancelTicket(String bookingId) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement cancelButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(
+                "//input[@type='button' and @value='Cancel' and contains(@onclick, 'DeleteTicket(" + bookingId + ")')]")));
+        Utilities.scrollToElement(driver, cancelButton);
+        cancelButton.click();
+    }
+
+    public void confirmCancel() {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            wait.until(ExpectedConditions.alertIsPresent());
+            driver.switchTo().alert().accept();
+        } catch (Exception e) {
+            System.out.println("Không có alert xác nhận: " + e.getMessage());
+        }
+    }
+
+    public void verifyTicketDisappeared(String bookingId) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        List<WebElement> rows = driver.findElements(By.xpath(
+                "//input[@type='button' and @value='Cancel' and contains(@onclick, 'DeleteTicket(" + bookingId + ")')]"));
+        if (!rows.isEmpty()) {
+            System.out.println("HTML của trang My Ticket:\n" + driver.getPageSource());
+            throw new AssertionError("Vé với ID " + bookingId + " vẫn hiển thị sau khi hủy.");
+        }
+    }
 }
